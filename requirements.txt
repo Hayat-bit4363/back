@@ -4,6 +4,6 @@ channels
 daphne
 djangorestframework-simplejwt
 django-cors-headers
-mysqlclient
+PyMySQL
 Pillow
 whitenoise
