@@ -51,9 +51,8 @@ class MessageCreateView(generics.CreateAPIView):
     parser_classes = [parsers.MultiPartParser, parsers.FormParser]
 
     def perform_create(self, serializer):
-        conversation_id = self.request.data.get('conversation_id')
-        # if conversation_id is part of url or body? usually body for create
-        # But wait, the serializer expects 'conversation'.
-        # Let's check how frontend sends it.
-        # Frontend will likely send 'conversation' id.
-        serializer.save(sender=self.request.user)
+        try:
+            serializer.save(sender=self.request.user)
+        except Exception as e:
+            print(f"ERROR creating message: {str(e)}")
+            raise e
