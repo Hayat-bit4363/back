@@ -57,7 +57,7 @@ class SendOTPView(generics.GenericAPIView):
             }, status=status.HTTP_200_OK)
         
         return Response({'message': 'OTP sent successfully.'}, status=status.HTTP_200_OK)
-
+#n
 class VerifyOTPView(generics.GenericAPIView):
     permission_classes = (permissions.AllowAny,)
     serializer_class = VerifyOTPSerializer
