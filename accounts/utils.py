@@ -14,15 +14,15 @@ def send_verification_email(user, code):
     email_from = settings.DEFAULT_FROM_EMAIL
     recipient_list = [user.email]
     
-    print(f"DEBUG: Attempting to send email to {user.email} using {settings.EMAIL_HOST}")
+    print(f"\n--------------------------------------")
+    print(f"  OTP CODE FOR {user.email}: {code}")
+    print(f"--------------------------------------\n")
     
     try:
-        # Using fail_silently=False so we catch the actual error in our try/except block
         send_mail(subject, message, email_from, recipient_list, fail_silently=False)
-        print("DEBUG: Email sent successfully!")
+        print(f"DEBUG: Email sent successfully to {user.email}")
         return True
     except Exception as e:
-        # This will catch the 'Network is unreachable' error
-        print(f"CRITICAL: Failed to send email to {user.email}: {str(e)}")
-        logger.error(f"SMTP Error: {str(e)}")
+        print(f"SMTP ERROR: Network issue sending email to {user.email}: {str(e)}")
+        print(f"NOTE: Proceeding anyway for testing. Use the code logged above.")
         return False
