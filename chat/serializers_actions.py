@@ -16,3 +16,4 @@ class StatusSerializer(serializers.ModelSerializer):
     class Meta:
         model = Status
         fields = ['id', 'user', 'image', 'caption', 'created_at', 'expires_at']
+        read_only_fields = ['expires_at']
