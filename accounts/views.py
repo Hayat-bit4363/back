@@ -51,7 +51,10 @@ class SendOTPView(generics.GenericAPIView):
         email_sent = send_verification_email(mock_user, code)
         
         if not email_sent:
-            return Response({'error': 'Failed to send OTP email. Please try again later.'}, status=status.HTTP_503_SERVICE_UNAVAILABLE)
+            return Response({
+                'message': 'OTP generated. Note: Email delivery timed out. Please find your code in the Railway Server Logs.',
+                'warning': 'email_failed'
+            }, status=status.HTTP_200_OK)
         
         return Response({'message': 'OTP sent successfully.'}, status=status.HTTP_200_OK)
 #n
