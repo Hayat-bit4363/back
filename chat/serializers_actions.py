@@ -9,8 +9,10 @@ class MessageActionSerializer(serializers.ModelSerializer):
         model = Message
         fields = ['id', 'text', 'is_edited', 'starred_by']
 
+from accounts.serializers import UserSerializer
+
 class StatusSerializer(serializers.ModelSerializer):
-    user = serializers.StringRelatedField() # Or full UserSerializer
+    user = UserSerializer(read_only=True)
     class Meta:
         model = Status
         fields = ['id', 'user', 'image', 'caption', 'created_at', 'expires_at']

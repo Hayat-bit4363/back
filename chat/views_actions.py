@@ -1,4 +1,5 @@
 from rest_framework import generics, permissions, status
+from django.db import models
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from .models import Message, Status
@@ -63,6 +64,18 @@ class StarMessageView(APIView):
         else:
             message.starred_by.add(request.user)
             return Response({'message': 'Starred'})
+
+class StatusListView(generics.ListAPIView):
+    serializer_class = StatusSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        # Fetch statuses of user and their friends that haven't expired
+        friend_ids = self.request.user.friends.values_list('id', flat=True)
+        return Status.objects.filter(
+            models.Q(user=self.request.user) | models.Q(user_id__in=friend_ids),
+            expires_at__gt=timezone.now()
+        ).order_by('-created_at')
 
 class StatusCreateView(generics.CreateAPIView):
     queryset = Status.objects.all()
