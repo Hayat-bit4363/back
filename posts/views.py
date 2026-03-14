@@ -42,3 +42,18 @@ class LikePostView(APIView):
         else:
             post.likes.add(request.user)
             return Response({'status': 'liked', 'likes_count': post.likes.count()})
+
+class SharePostView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def post(self, request, pk):
+        original_post = get_object_or_404(Post, pk=pk)
+        # Create a new post referencing the original
+        new_post = Post.objects.create(
+            author=request.user,
+            content=f"Shared from {original_post.author.username}: {original_post.content}",
+            shared_from=original_post,
+            # We don't copy the image directly, we just reference the original
+        )
+        serializer = PostSerializer(new_post, context={'request': request})
+        return Response(serializer.data, status=status.HTTP_201_CREATED)

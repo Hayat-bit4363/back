@@ -22,10 +22,17 @@ class PostSerializer(serializers.ModelSerializer):
     comments = CommentSerializer(many=True, read_only=True)
     likes_count = serializers.SerializerMethodField()
     is_liked = serializers.SerializerMethodField()
+    shared_from = serializers.PrimaryKeyRelatedField(read_only=True) # For simple ID
+    original_post = serializers.SerializerMethodField()
 
     class Meta:
         model = Post
-        fields = ['id', 'author', 'content', 'image', 'created_at', 'likes_count', 'is_liked', 'comments']
+        fields = ['id', 'author', 'content', 'image', 'created_at', 'likes_count', 'is_liked', 'comments', 'shared_from', 'original_post']
+
+    def get_original_post(self, obj):
+        if obj.shared_from:
+            return PostSerializer(obj.shared_from, context=self.context).data
+        return None
 
     def get_likes_count(self, obj):
         return obj.likes.count()
