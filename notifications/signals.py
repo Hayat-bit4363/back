@@ -11,10 +11,21 @@ def create_notification(sender, instance, created, **kwargs):
         conversation = instance.conversation
         for participant in conversation.participants.all():
             if participant != instance.sender:
+                # Prepare notification content
+                preview_text = ""
+                if instance.text:
+                    preview_text = instance.text[:30] + ("..." if len(instance.text) > 30 else "")
+                elif instance.audio:
+                    preview_text = "Sent a vocal message"
+                elif instance.image:
+                    preview_text = "Sent an image"
+                else:
+                    preview_text = "New message"
+
                 # Create Notification
                 notification = Notification.objects.create(
                     user=participant,
-                    content=f"New message from {instance.sender.username}: {instance.text[:30]}..."
+                    content=f"{instance.sender.username}: {preview_text}"
                 )
                 
                 # Send to WebSocket

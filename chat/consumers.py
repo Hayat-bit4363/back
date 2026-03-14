@@ -28,7 +28,18 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
     # Receive message from WebSocket
     async def receive(self, text_data):
-        pass # Client sends via API now
+        data = json.loads(text_data)
+        message_type = data.get('type')
+
+        if message_type == 'call_signal':
+            # Broadcast call signals (offer, answer, candidates) to the room
+            await self.channel_layer.group_send(
+                self.room_group_name,
+                {
+                    'type': 'call_signal',
+                    'data': data
+                }
+            )
 
     # Receive message from room group
     async def chat_message(self, event):
@@ -39,6 +50,10 @@ class ChatConsumer(AsyncWebsocketConsumer):
             'type': 'chat_message',
             'message': message 
         }))
+
+    async def call_signal(self, event):
+        # Send call signal to the client
+        await self.send(text_data=json.dumps(event['data']))
 
     @database_sync_to_async
     def save_message(self, sender_id, message):

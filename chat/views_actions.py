@@ -29,6 +29,22 @@ class MessageActionView(APIView):
             if message.sender == request.user:
                 message.is_dropped = True
                 message.save()
+                
+                # Broadcast deletion
+                from channels.layers import get_channel_layer
+                from asgiref.sync import async_to_sync
+                channel_layer = get_channel_layer()
+                async_to_sync(channel_layer.group_send)(
+                    f"chat_{message.conversation.id}",
+                    {
+                        "type": "chat_message",
+                        "message": {
+                            "id": message.id,
+                            "type": "message_deleted",
+                            "delete_type": "everyone"
+                        }
+                    }
+                )
                 return Response({'message': 'Message deleted for everyone'})
             return Response({'error': 'Not authorized'}, status=status.HTTP_403_FORBIDDEN)
         
