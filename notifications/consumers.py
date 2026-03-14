@@ -20,6 +20,7 @@ class NotificationConsumer(AsyncWebsocketConsumer):
     async def receive(self, text_data):
         data = json.loads(text_data)
         print(f"Notification WS: Received message: {data.get('type')} signal: {data.get('signal')}")
+        print(f"DEBUG: Data contents: {data.keys()}")
         
         if data.get('type') == 'call_signal':
             # Send to specific user
